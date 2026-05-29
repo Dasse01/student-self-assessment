@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>자기평가서</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root{
+    --ink:#222;
+    --line:#9aa0aa;
+    --line-soft:#d7dbe2;
+    --green-lab:#dfead0; --green-hd:#eef3e6;
+    --gold-hd:#f6edcf; --gold-line:#d9c98f;
+    --pink-lab:#f6d4d8; --pink-hd:#fbe7e9;
+    --blue-lab:#cfe6f4; --blue-hd:#e6f2fa;
+    --navy:#0D2B6E; --gold:#C9A84C;
+    --font:"Malgun Gothic","맑은 고딕","Noto Sans KR",sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:#e9ebf0;font-family:var(--font);color:var(--ink);-webkit-font-smoothing:antialiased;padding:28px 14px 90px;font-size:13px;}
+
+  .toolbar{position:sticky;top:10px;z-index:50;max-width:794px;margin:0 auto 20px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:rgba(13,43,110,.97);border-radius:13px;padding:11px 14px;box-shadow:0 10px 28px rgba(13,43,110,.25);}
+  .toolbar .brand{display:flex;align-items:center;gap:9px;color:#fff;font-weight:700;font-size:14.5px;margin-right:auto;}
+  .toolbar .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,.25);}
+  .btn{appearance:none;border:none;cursor:pointer;font-family:var(--font);font-size:13px;font-weight:600;padding:9px 14px;border-radius:9px;color:#fff;background:rgba(255,255,255,.13);transition:.16s;display:inline-flex;align-items:center;gap:6px;}
+  .btn:hover{background:rgba(255,255,255,.24);transform:translateY(-1px);}
+  .btn.gold{background:var(--gold);color:#3a2e08;}
+  .btn.gold:hover{background:#d8b95e;}
+  .btn.demo{background:rgba(34,211,238,.16);color:#a5f3fc;border:1px solid rgba(34,211,238,.4);}
+  .btn.demo:hover{background:rgba(34,211,238,.28);}
+  .btn.word{background:rgba(43,87,154,.92);color:#eaf1ff;border:1px solid rgba(110,150,220,.5);}
+  .btn.word:hover{background:rgba(53,100,175,1);}
+  .btn.demo.on{background:rgba(239,68,68,.18);color:#fecaca;border-color:rgba(239,68,68,.45);}
+  .btn svg{width:15px;height:15px;}
+  .btn:disabled{opacity:.55;cursor:wait;transform:none;}
+  .hint{max-width:794px;margin:0 auto 18px;font-size:12px;color:#5a6172;text-align:center;line-height:1.65;}
+  .hint b{color:var(--navy);}
+
+  .page{width:794px;min-height:1123px;margin:0 auto 22px;background:#fff;padding:40px 44px;box-shadow:0 3px 18px rgba(0,0,0,.14);position:relative;}
+
+  .topnote{text-align:center;font-size:11.5px;color:#444;margin-bottom:16px;letter-spacing:-.2px;}
+  .period{text-align:center;font-weight:700;font-size:16px;color:var(--navy);margin:0 0 6px;letter-spacing:.5px;}
+  .period:focus{outline:none;background:rgba(201,168,76,.16);border-radius:5px;}
+  .period:empty:before{content:attr(data-ph);color:#aab;font-weight:400;}
+  .sec-title{font-weight:700;font-size:14.5px;margin:0 0 9px;color:#1a1a1a;letter-spacing:-.3px;}
+
+  table.t{width:100%;border-collapse:collapse;border:1.4px solid #555;table-layout:fixed;}
+  table.t th,table.t td{border:1px solid var(--line);padding:0;vertical-align:top;}
+  .hdr-main{background:#f2f2f2;text-align:center;font-weight:700;font-size:12px;padding:7px 4px !important;}
+  .hdr-green{background:var(--green-hd);}
+  .lab{font-weight:700;text-align:center;vertical-align:middle !important;font-size:12px;padding:6px 3px !important;line-height:1.45;}
+  .lab.green{background:var(--green-lab);}
+  .lab.pink{background:var(--pink-lab);}
+  .lab.blue{background:var(--blue-lab);}
+
+  .sub{font-size:11.5px;font-weight:700;color:#333;padding:5px 8px 2px;}
+  .sub .ph{font-weight:400;color:#777;}
+  .write{min-height:22px;padding:5px 9px;font-size:12.5px;line-height:1.95;outline:none;white-space:pre-wrap;word-break:break-word;
+         background-image:repeating-linear-gradient(transparent,transparent 27px,var(--line-soft) 27px,var(--line-soft) 28px);}
+  .write.tall{min-height:84px;}
+  .write.xtall{min-height:120px;}
+  .write.huge{min-height:175px;}
+  .write:focus{background-color:#fffdf2;}
+  .write:empty:before{content:attr(data-ph);color:#aab;}
+
+  .goldbar{background:var(--gold-hd);border:1.2px solid var(--gold-line);text-align:center;font-weight:700;font-size:12.5px;padding:7px 6px;}
+  .goldbar .s{display:block;font-weight:400;font-size:11px;color:#6a5d2e;margin-top:2px;}
+
+  .scorehead{padding:7px 9px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .scorehead .blank{display:inline-block;min-width:60px;border-bottom:1px solid #888;font-weight:400;}
+  .stars{letter-spacing:2px;font-size:15px;color:var(--gold);}
+  .stars span{cursor:pointer;}
+  .scorehead .note{font-weight:400;color:#777;font-size:11px;}
+
+  .foot{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding-top:8px;border-top:1px solid var(--gold);font-size:10px;color:#888;}
+  .foot .org{color:var(--navy);font-weight:700;}
+  .pageno{position:absolute;bottom:14px;right:24px;font-size:10px;color:#aaa;}
+
+  [contenteditable].lbltxt:focus{outline:none;background:rgba(201,168,76,.18);}
+
+  /* ---- collapsible guide panel ---- */
+  .guide{max-width:794px;margin:0 auto 20px;display:flex;flex-direction:column;gap:10px;}
+  .acc{background:#fff;border:1px solid #d9dee8;border-left:4px solid var(--gold);border-radius:11px;overflow:hidden;box-shadow:0 2px 10px rgba(13,43,110,.06);}
+  .acc[open]{box-shadow:0 6px 20px rgba(13,43,110,.12);}
+  .acc summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;padding:14px 18px;font-weight:700;font-size:14.5px;color:var(--navy);user-select:none;}
+  .acc summary::-webkit-details-marker{display:none;}
+  .acc summary .ic{flex:none;width:26px;height:26px;border-radius:7px;background:var(--navy);color:var(--gold);display:flex;align-items:center;justify-content:center;font-size:14px;}
+  .acc summary .chev{margin-left:auto;transition:transform .22s;color:#9aa3b5;font-size:13px;}
+  .acc[open] summary .chev{transform:rotate(180deg);}
+  .acc summary .tag{font-weight:400;font-size:11.5px;color:#8b93a4;margin-left:2px;}
+  .acc .body{padding:4px 22px 20px;font-size:13px;line-height:1.78;color:#33384a;border-top:1px solid #eef0f5;}
+  .acc .body h4{margin:16px 0 7px;font-size:13.5px;color:var(--navy);display:flex;align-items:center;gap:8px;}
+  .acc .body h4 .n{flex:none;width:21px;height:21px;border-radius:50%;background:var(--gold);color:#3a2e08;font-size:11.5px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+  .acc .body p{margin:5px 0;}
+  .acc .body .q{color:#6b7280;font-style:italic;}
+  .acc .body ul{margin:5px 0 5px;padding-left:20px;}
+  .acc .body li{margin:3px 0;}
+  .acc .body .bad{color:#b4485a;}
+  .acc .body .good{color:#1d7a4d;}
+  .acc .body .ex{background:#f7f9fc;border-left:3px solid var(--gold-line);padding:8px 12px;border-radius:0 8px 8px 0;margin:8px 0;color:#3a3f52;font-size:12.5px;}
+  .acc .body .kbd{display:inline-block;background:#eef1f8;border:1px solid #cdd5e6;border-radius:5px;padding:0 6px;font-size:12px;color:var(--navy);font-weight:600;}
+  .acc .body .lead{font-weight:700;color:#1a1a1a;}
+  .src{max-width:794px;margin:-6px auto 18px;font-size:11px;color:#9aa3b5;text-align:right;}
+
+  /* ===== HERO (검색기 스타일 다크 HUD) ===== */
+  .hero-wrap{position:relative;min-height:330px;margin:-28px -14px 24px;display:flex;flex-direction:column;justify-content:center;overflow:hidden;background:linear-gradient(135deg,#040712 0%,#0a1226 50%,#0c1c3a 100%);}
+  .hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(59,130,246,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(59,130,246,.06) 1px,transparent 1px);background-size:48px 48px;animation:gridMove 18s linear infinite;}
+  @keyframes gridMove{0%{transform:translateY(0)}100%{transform:translateY(48px)}}
+  .orb{position:absolute;border-radius:50%;filter:blur(90px);pointer-events:none;animation:orbFloat 9s ease-in-out infinite;}
+  .orb1{width:500px;height:500px;background:rgba(59,130,246,.13);top:-160px;left:-90px;}
+  .orb2{width:340px;height:340px;background:rgba(6,182,212,.10);top:-20px;right:60px;animation-delay:-4s;}
+  .orb3{width:300px;height:300px;background:rgba(201,168,76,.10);bottom:-120px;left:38%;animation-delay:-7s;}
+  @keyframes orbFloat{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-26px) scale(1.05)}}
+  .scan-line{position:absolute;width:100%;height:2px;background:linear-gradient(90deg,transparent,#22d3ee,transparent);animation:scan 5s ease-in-out infinite;opacity:.35;top:0;}
+  @keyframes scan{0%{top:0;opacity:0}10%{opacity:.35}90%{opacity:.35}100%{top:100%;opacity:0}}
+  .corner{position:absolute;width:54px;height:54px;border-color:#3b82f6;border-style:solid;opacity:.4;animation:cpulse 3s ease-in-out infinite;}
+  .corner-tl{top:16px;left:16px;border-width:2px 0 0 2px}.corner-tr{top:16px;right:16px;border-width:2px 2px 0 0}
+  .corner-bl{bottom:46px;left:16px;border-width:0 0 2px 2px}.corner-br{bottom:46px;right:16px;border-width:0 2px 2px 0}
+  @keyframes cpulse{0%,100%{opacity:.4}50%{opacity:.8}}
+  #heroParticles{position:absolute;inset:0;pointer-events:none;z-index:1;}
+  .ticker-wrap{position:absolute;bottom:0;left:0;right:0;background:rgba(59,130,246,.08);border-top:1px solid rgba(59,130,246,.2);overflow:hidden;height:34px;display:flex;align-items:center;}
+  .ticker-inner{display:flex;gap:54px;white-space:nowrap;animation:tick 32s linear infinite;}
+  .ticker-item{font-size:10px;letter-spacing:.16em;color:#67e8f9;font-weight:700;}
+  @keyframes tick{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+  .hero-content{position:relative;z-index:10;max-width:794px;width:100%;margin:0 auto;padding:42px 28px 52px;}
+  .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.32);border-radius:999px;padding:5px 14px;font-size:10px;letter-spacing:.18em;color:#93c5fd;font-weight:700;margin-bottom:15px;animation:fadeDown .6s both;}
+  .hero-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:#22d3ee;animation:blink 1.4s ease-in-out infinite;}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.15}}
+  .hero-title{font-weight:900;font-size:clamp(28px,5vw,46px);line-height:1.12;letter-spacing:-.03em;margin-bottom:12px;animation:fadeDown .6s .1s both;}
+  .hero-title .l1{display:block;color:#e2e8f0;}
+  .hero-title .l2{display:block;background:linear-gradient(90deg,#3b82f6,#22d3ee,#14b8a6 70%,#C9A84C);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;}
+  .hero-sub{color:#9fb0c8;font-size:13.5px;font-weight:300;margin-bottom:22px;animation:fadeDown .6s .2s both;}
+  .hero-stats{display:flex;gap:22px;flex-wrap:wrap;align-items:center;animation:fadeDown .6s .3s both;}
+  .stat-item{display:flex;flex-direction:column;gap:3px;}
+  .stat-num{font-family:'Orbitron',monospace;font-size:24px;font-weight:900;color:#60a5fa;line-height:1;text-shadow:0 0 20px rgba(59,130,246,.5);}
+  .stat-num.gold{color:#e6c768;text-shadow:0 0 20px rgba(201,168,76,.5);}
+  .stat-label{font-size:9.5px;color:#64748b;letter-spacing:.12em;}
+  .stat-sep{width:1px;height:30px;background:#1e3a5f;}
+  @keyframes fadeDown{from{opacity:0;transform:translateY(-18px)}to{opacity:1;transform:translateY(0)}}
+  .hero-author{position:absolute;top:20px;right:24px;z-index:11;animation:fadeDown .7s .5s both;display:flex;flex-direction:column;align-items:flex-end;gap:12px;}
+  .author-chip{display:inline-flex;align-items:center;gap:10px;background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.42);border-radius:999px;padding:6px 16px 6px 7px;backdrop-filter:blur(4px);box-shadow:0 4px 18px rgba(201,168,76,.12);}
+  .author-chip .av{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#e6c768,#C9A84C);display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px rgba(201,168,76,.5);}
+  .author-chip .av svg{width:16px;height:16px;}
+  .author-chip .at{font-size:12px;color:#d9c692;letter-spacing:.02em;line-height:1.2;}
+  .author-chip .at .role{display:block;font-size:9px;color:#a8966a;letter-spacing:.16em;margin-bottom:1px;}
+  .author-chip .at b{color:#f4e7bd;font-weight:800;font-size:13px;}
+  /* compass */
+  .compass-box{display:flex;flex-direction:column;align-items:center;gap:5px;}
+  .compass{width:118px;height:118px;filter:drop-shadow(0 0 18px rgba(34,211,238,.3));}
+  .cmp-bezel{transform-box:fill-box;transform-origin:center;animation:cmpSpin 26s linear infinite;}
+  .cmp-needle{transform-box:fill-box;transform-origin:center;animation:cmpSway 7s ease-in-out infinite;}
+  @keyframes cmpSpin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+  @keyframes cmpSway{0%{transform:rotate(-2deg)}12%{transform:rotate(-34deg)}30%{transform:rotate(22deg)}46%{transform:rotate(-14deg)}62%{transform:rotate(11deg)}78%{transform:rotate(-6deg)}90%{transform:rotate(3deg)}100%{transform:rotate(-2deg)}}
+  .cmp-glow{animation:cmpGlow 3.2s ease-in-out infinite;transform-origin:center;}
+  @keyframes cmpGlow{0%,100%{opacity:.25}50%{opacity:.6}}
+  .compass-cap{font-size:8.5px;letter-spacing:.22em;color:#67e8f9;font-weight:700;text-transform:uppercase;opacity:.85;}
+  @media (max-width:600px){.hero-author{position:static;display:flex;justify-content:flex-start;margin:0 0 14px 28px;}}
+
+  @media print{body{background:#fff;padding:0;}.toolbar,.hint,.guide,.src,.hero-wrap,.no-print{display:none !important;}.page{box-shadow:none;margin:0 auto;page-break-after:always;}}
+</style>
+</head>
+<body>
+
+<div class="hero-wrap no-print">
+  <div class="hero-grid"></div>
+  <div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+  <div class="scan-line"></div>
+  <div class="corner corner-tl"></div><div class="corner corner-tr"></div>
+  <div class="corner corner-bl"></div><div class="corner corner-br"></div>
+  <canvas id="heroParticles"></canvas>
+  <div class="hero-author">
+    <div class="author-chip">
+      <span class="av"><svg viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M20 4.5 Q21.2 18.8 35.5 20 Q21.2 21.2 20 35.5 Q18.8 21.2 4.5 20 Q18.8 18.8 20 4.5 Z" fill="#0D2B6E"/><path d="M30 7.5 Q30.5 9.6 32.8 10 Q30.5 10.4 30 12.5 Q29.5 10.4 27.2 10 Q29.5 9.6 30 7.5 Z" fill="#0D2B6E" opacity=".85"/></svg></span>
+      <span class="at"><span class="role">작성자</span><b>시대학원 김휘창 원장</b></span>
+    </div>
+    <div class="compass-box">
+      <svg class="compass" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+        <circle class="cmp-glow" cx="40" cy="40" r="37" fill="none" stroke="#22d3ee" stroke-width="1.5" opacity=".4"/>
+        <circle cx="40" cy="40" r="34" fill="rgba(8,14,30,.55)" stroke="rgba(201,168,76,.65)" stroke-width="1.4"/>
+        <g class="cmp-bezel" stroke="rgba(96,165,250,.55)" stroke-width="1">
+          <line x1="40" y1="8" x2="40" y2="13"/><line x1="40" y1="67" x2="40" y2="72"/>
+          <line x1="8" y1="40" x2="13" y2="40"/><line x1="67" y1="40" x2="72" y2="40"/>
+          <line x1="17" y1="17" x2="20.5" y2="20.5"/><line x1="63" y1="17" x2="59.5" y2="20.5"/>
+          <line x1="17" y1="63" x2="20.5" y2="59.5"/><line x1="63" y1="63" x2="59.5" y2="59.5"/>
+        </g>
+        <text x="40" y="20" text-anchor="middle" fill="#e6c768" font-size="9" font-weight="900" font-family="Orbitron,monospace">N</text>
+        <text x="40" y="65.5" text-anchor="middle" fill="#7b8aa3" font-size="7.5" font-weight="700" font-family="Orbitron,monospace">S</text>
+        <text x="64" y="43" text-anchor="middle" fill="#7b8aa3" font-size="7.5" font-weight="700" font-family="Orbitron,monospace">E</text>
+        <text x="16" y="43" text-anchor="middle" fill="#7b8aa3" font-size="7.5" font-weight="700" font-family="Orbitron,monospace">W</text>
+        <g class="cmp-needle">
+          <polygon points="40,16 45,40 40,40 35,40" fill="#e6c768"/>
+          <polygon points="40,64 45,40 40,40 35,40" fill="#5b6b86"/>
+        </g>
+        <circle cx="40" cy="40" r="3.4" fill="#0a1226" stroke="#e6c768" stroke-width="1.3"/>
+        <circle cx="40" cy="40" r="1.1" fill="#e6c768"/>
+      </svg>
+      <span class="compass-cap">탐구의 방향</span>
+    </div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-badge">자기평가서 · 생기부 기록용 v1.0</div>
+    <h1 class="hero-title">
+      <span class="l2">자기평가서</span>
+    </h1>
+    <p class="hero-sub">활동의 나열이 아닌 ‘사고와 성장의 구조’를 보여주는 — 나를 설명하는 힘</p>
+    <div class="hero-stats">
+      <div class="stat-item"><span class="stat-num" id="hs1">5</span><span class="stat-label">자기평가 영역</span></div>
+      <div class="stat-sep"></div>
+      <div class="stat-item"><span class="stat-num gold" id="hs2">6</span><span class="stat-label">사고 구조 단계</span></div>
+      <div class="stat-sep"></div>
+      <div class="stat-item"><span class="stat-num" id="hs3">5</span><span class="stat-label">독서 기록</span></div>
+      <div class="stat-sep"></div>
+      <div class="stat-item"><span class="stat-num" id="hs4">5</span><span class="stat-label">창의적 체험활동</span></div>
+    </div>
+  </div>
+  <div class="ticker-wrap"><div class="ticker-inner" id="heroTicker"></div></div>
+</div>
+
+<div class="toolbar no-print">
+  <div class="brand"><span class="dot"></span> 자기평가서</div>
+  <button class="btn demo" id="demoBtn" onclick="toggleDemo(this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3l14 9-14 9V3z"/></svg>
+    데모 채우기
+  </button>
+  <button class="btn" onclick="window.print()">인쇄</button>
+  <button class="btn" id="pngBtn" onclick="savePNG()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>
+    고해상도 PNG
+  </button>
+  <button class="btn word" id="wordBtn" onclick="saveWord()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8.5 13l1.2 4 1.3-3 1.3 3 1.2-4"/></svg>
+    Word 저장
+  </button>
+  <button class="btn gold" id="pdfBtn" onclick="savePDF()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+    PDF 저장
+  </button>
+</div>
+<div class="guide no-print">
+  <!-- 사용자 매뉴얼 -->
+  <details class="acc">
+    <summary><span class="ic">📖</span> 사용자 매뉴얼 <span class="tag">작성·저장 방법</span><span class="chev">▼</span></summary>
+    <div class="body">
+      <h4><span class="n">1</span> 시기 입력</h4>
+      <p>양식 맨 위의 <span class="lead">학년도·학기 칸</span>(예: 2026학년도 1학기)을 클릭해 해당 시기로 자유롭게 바꿔 적습니다. 이 시기 표기는 저장·인쇄물에도 그대로 들어갑니다.</p>
+      <h4><span class="n">2</span> 내용 입력</h4>
+      <p>양식의 <span class="lead">모든 칸과 제목·라벨을 클릭</span>하면 바로 글자를 입력·수정할 수 있습니다. 항목명(예: 활동 날짜, 표 머리글)도 자유롭게 바꿀 수 있습니다.</p>
+      <h4><span class="n">3</span> 만족도 별점</h4>
+      <p>「1학기 생활 자기평가」의 <span class="lead">만족도 별(☆)</span>을 클릭하면 그 개수만큼 색칠(★)되고, 같은 별을 다시 누르면 해제됩니다.</p>
+      <h4><span class="n">4</span> 데모(예시) 미리보기</h4>
+      <p><span class="kbd">데모 채우기</span>를 누르면 양식 전체에 짜임새 있는 <span class="lead">예시 내용이 자동으로 채워져</span> 완성본을 미리 볼 수 있습니다. 다시 누르면(데모 비우기) 확인 후 빈 양식으로 되돌아갑니다. 학생에게 작성 수준을 보여줄 때 활용하세요.</p>
+      <h4><span class="n">5</span> 저장 · 출력 (제출용)</h4>
+      <ul>
+        <li><span class="kbd">Word 저장</span> — 작성한 내용을 <b>편집 가능한 워드 문서(.doc)</b>로 저장합니다. 표·항목·답변이 그대로 들어가 워드·한글(HWP)에서 수정·제출하기 편합니다. (제출용으로 권장)</li>
+        <li><span class="kbd">고해상도 PNG</span> — 5장 전체를 한 장의 고해상도 이미지(scale ×3)로 저장합니다.</li>
+        <li><span class="kbd">PDF 저장</span> — A4 5페이지 PDF 한 파일로 저장합니다.</li>
+        <li><span class="kbd">인쇄</span> — 브라우저 인쇄 창에서 바로 출력하거나 PDF로 인쇄할 수 있습니다.</li>
+      </ul>
+      <p style="color:#6b7280;font-size:12.5px;">※ 저장·인쇄 시 상단 도구막대·이 안내·히어로 배너는 자동으로 제외되어, 출력물에는 양식 5페이지만 깔끔하게 들어갑니다. 파일명은 <span class="kbd">Self_Assessment_2026_1</span> 로 생성됩니다. (일부 최신 워드에서 .doc 열 때 형식 확인 안내가 한 번 뜰 수 있으나 그대로 열면 정상 편집됩니다.)</p>
+      <h4><span class="n">6</span> 작성 팁</h4>
+      <p>각 칸의 <span class="q">연한 안내문</span>은 무엇을 써야 할지 알려주는 가이드입니다. 아래 <b>이론적 배경</b>의 6단계 흐름을 떠올리며 ‘느낀 점·감상문’ 칸을 채우면 훨씬 짜임새 있는 글이 됩니다.</p>
+      <p style="color:#6b7280;font-size:12.5px;">권장 흐름 — <b>데모로 예시 확인 → 직접 작성 → Word 저장 → 제출</b></p>
+    </div>
+  </details>
+
+  <!-- 이론적 배경 -->
+  <details class="acc">
+    <summary><span class="ic">🎓</span> 이론적 배경 <span class="tag">자기평가서, 결국 ‘나를 설명하는 힘’</span><span class="chev">▼</span></summary>
+    <div class="body">
+      <p><span class="lead">자기평가서는 활동 요약문도, ‘열심히 했다’는 감상문도 아닙니다.</span> 활동 자체보다 <b>‘활동을 해석하는 능력’</b>을 보여주는 글입니다. 핵심은 “무엇을 했는가”가 아니라 <b>“어떻게 생각했는가”</b> — 활동 뒤에 숨은 <b>사고 과정</b>을 드러내는 것입니다.</p>
+
+      <p class="lead" style="margin-top:14px;color:var(--navy);">잘 쓰기 위한 6단계 구조</p>
+
+      <h4><span class="n">1</span> 수업 연계</h4>
+      <p class="q">교과에서 무엇을 배우고 있었는가?</p>
+      <p>활동을 교과 배움과 연결하면 단순 체험이 아닌 ‘배움을 확장한 학생’으로 보입니다. 학종에서 대학은 체험보다 <b>교과 기반 탐구</b>를 높게 평가합니다.</p>
+
+      <h4><span class="n">2</span> 자신의 역할</h4>
+      <p class="q">나는 구체적으로 무엇을 했는가?</p>
+      <p><span class="bad">✗ “팀원들과 협력했다 / 조사에 참여했다”</span> 같은 막연한 표현 대신, <span class="good">✓ “설문 문항을 직접 설계했다, 통계를 그래프로 시각화했다”</span>처럼 실제 역할을 드러냅니다. 대학은 결과보다 <b>기여도</b>를 봅니다.</p>
+
+      <h4><span class="n">3</span> 참고 도서 및 자료</h4>
+      <p class="q">어떤 방식으로 탐구를 확장했는가?</p>
+      <p>책 제목만 적지 말고, 왜 그 자료를 골랐고 어떤 내용을 참고해 기존 생각과 어떻게 연결했는지를 씁니다. 참고문헌은 ‘읽었다’의 증거가 아니라 <b>사고 확장의 흔적</b>이어야 합니다.</p>
+
+      <h4><span class="n">4</span> 구체적 결과물</h4>
+      <p class="q">탐구가 어떤 형태로 남았는가?</p>
+      <p>탐구보고서·분석표·포스터·발표자료·인터뷰 정리 등 <b>실제 산출물</b>이 있을 때 활동의 신뢰도가 높아집니다.</p>
+
+      <h4><span class="n">5</span> 경험과 성장 <span style="font-size:11px;color:var(--gold);font-weight:700;">★ 핵심</span></h4>
+      <p class="q">무엇을 새롭게 배우고 느꼈는가?</p>
+      <p><span class="bad">✗ “많은 것을 느꼈다 / 뜻깊은 시간이었다”</span>는 너무 추상적입니다. 생각이 어떻게 바뀌었는지, 어떤 한계·어려움을 만나 어떻게 수정했는지를 씁니다.</p>
+      <div class="ex">“처음엔 쇼핑몰의 경제 효과를 조사하려 했지만, 자료를 찾으며 <b>공간 배치가 소비 행동을 유도한다</b>는 점에 흥미를 느껴 동선 구조 분석으로 탐구 방향을 수정하였다.” — 사고 과정이 살아 있는 문장</div>
+
+      <h4><span class="n">6</span> 역량</h4>
+      <p class="q">그래서 이 활동이 나에게 무엇을 남겼는가?</p>
+      <p>자료 분석력·문제 해결력·비판적 사고력·자기주도성 등은 <span class="bad">“비판적 사고력이 향상되었다”</span>처럼 ‘말’로 선언하지 않고, <b>활동 과정 속에서 자연스럽게 드러나게</b> 합니다.</p>
+
+      <p class="lead" style="margin-top:14px;color:var(--navy);">가장 중요한 것 — ‘과정의 흔적’</p>
+      <p>대학과 교사가 보고 싶은 것은 결과물이 아니라 <b>사고의 흐름</b>입니다(왜 시작했는지, 어떻게 자료를 찾고 고민하고 수정했는지, 어떤 질문이 새로 생겼는지). 그래서 자기평가서는 잘 꾸민 결과보고서가 아니라 <b>‘생각의 기록’</b>에 가깝습니다.</p>
+      <p>좋은 자기평가서는 <b>세특의 근거</b>가 되고 <b>면접 질문의 소재</b>가 되며, 무엇보다 자신의 배움과 성장을 스스로 다시 해석하는 <b>메타인지의 과정</b>입니다.</p>
+    </div>
+  </details>
+</div>
+<p class="src no-print">— 이론적 배경 출처: 「자기평가서, 결국 ‘나를 설명하는 힘’이다」</p>
+<p class="hint no-print">모든 칸·라벨을 클릭해 바로 수정할 수 있습니다. · 만족도 별(☆)은 클릭하면 색칠됩니다. · 저장 시 상단 막대·안내는 자동 제외됩니다.</p>
+
+<!-- PAGE 1 -->
+<div class="page" data-page="1">
+  <div class="period lbltxt" contenteditable="true" data-ph="(  )학년도 (  )학기">2026학년도 1학기</div>
+  <div class="topnote lbltxt" contenteditable="true">※ 여러분이 작성하는 모든 내용은 참고하여 생활기록부에 기재되니 신중하게 적어주세요 ※</div>
+  <p class="sec-title lbltxt" contenteditable="true">1. 창의적 체험활동 사항 - 자율활동</p>
+  <table class="t">
+    <colgroup><col style="width:90px"><col></colgroup>
+    <tr>
+      <th class="hdr-main hdr-green lbltxt" contenteditable="true">자율</th>
+      <th class="hdr-main lbltxt" contenteditable="true">★활동 내용, 얻게 된 점, 느낀 점을 구체적으로 작성</th>
+    </tr>
+    <tr>
+      <td class="lab green"><span class="lbltxt" contenteditable="true">흡연<br>예방교육<br>(4/21)</span></td>
+      <td>
+        <div class="sub lbltxt" contenteditable="true">교육 내용 요약 :</div>
+        <div class="write tall" contenteditable="true"></div>
+        <div class="sub lbltxt" contenteditable="true">느낀 점 :</div>
+        <div class="write tall" contenteditable="true"></div>
+      </td>
+    </tr>
+    <tr>
+      <td class="lab green"><span class="lbltxt" contenteditable="true">학급회의<br>(5/14)</span></td>
+      <td>
+        <div class="sub lbltxt" contenteditable="true">회의 주제 :</div>
+        <div class="write" contenteditable="true"></div>
+        <div class="sub lbltxt" contenteditable="true">제시한 의견 :</div>
+        <div class="write" contenteditable="true"></div>
+        <div class="sub lbltxt" contenteditable="true">느낀 점 :</div>
+        <div class="write tall" contenteditable="true"></div>
+      </td>
+    </tr>
+  </table>
+  <div class="pageno">- 1 -</div>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page" data-page="2">
+  <table class="t">
+    <colgroup><col style="width:90px"><col></colgroup>
+    <tr>
+      <td class="lab green"><span class="lbltxt" contenteditable="true">체육<br>한마당<br>(5/16)</span></td>
+      <td>
+        <div class="sub lbltxt" contenteditable="true">(선수로 활약한 경우) 참여 종목 작성 :</div>
+        <div class="write" contenteditable="true"></div>
+        <div class="sub lbltxt" contenteditable="true">성격, 역할, 느낀 점 등 :</div>
+        <div class="write huge" contenteditable="true"></div>
+      </td>
+    </tr>
+    <tr>
+      <td class="lab green"><span class="lbltxt" contenteditable="true">정보통신<br>윤리교육<br>(6/2)</span></td>
+      <td>
+        <div class="sub lbltxt" contenteditable="true">교육 내용 요약 :</div>
+        <div class="write tall" contenteditable="true"></div>
+        <div class="sub lbltxt" contenteditable="true">느낀 점 :</div>
+        <div class="write tall" contenteditable="true"></div>
+      </td>
+    </tr>
+    <tr>
+      <td class="lab green"><span class="lbltxt" contenteditable="true">2학기<br>학급자치회<br>임원선출<br>(7/3)</span></td>
+      <td>
+        <div class="sub lbltxt" contenteditable="true">임원 출마 여부 체크 ☐ <span class="ph">(출마했다면 공약 소개, 느낀 점 등)</span></div>
+        <div class="sub" contenteditable="true" style="font-weight:400;color:#777;">출마하지 않았다면 임원 선출 과정 중에 느낀 점 설명</div>
+        <div class="write huge" contenteditable="true"></div>
+      </td>
+    </tr>
+  </table>
+  <div class="pageno">- 2 -</div>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page" data-page="3">
+  <p class="sec-title lbltxt" contenteditable="true">2. 진로 활동 관리 - 진로희망분야</p>
+  <div class="goldbar lbltxt" contenteditable="true">진로희망분야(구체적으로 기재)<span class="s">(반드시 커리어넷에 나오는 명칭 적기, 없을 경우 진로명에 ○○ 입력하기)</span></div>
+  <div class="write tall" contenteditable="true" style="border:1px solid var(--line);border-top:none;"></div>
+  <div class="goldbar lbltxt" contenteditable="true" style="margin-top:8px;">선택하게 된 계기, 현재 하고 있는 노력 등 구체적으로 작성</div>
+  <div class="write" contenteditable="true" style="border:1px solid var(--line);border-top:none;min-height:205px;"></div>
+
+  <p class="sec-title lbltxt" contenteditable="true" style="margin-top:22px;">3. 행동 발달 사항</p>
+  <table class="t">
+    <colgroup><col style="width:90px"><col></colgroup>
+    <tr><th class="hdr-main lab pink lbltxt" colspan="2" contenteditable="true" style="text-align:center">1학기 1인 1역</th></tr>
+    <tr>
+      <td class="lab pink"><span class="lbltxt" contenteditable="true">맡은 역할</span></td>
+      <td><div class="write tall" data-ph="(구체적으로 작성)" contenteditable="true"></div></td>
+    </tr>
+    <tr>
+      <td class="lab pink"><span class="lbltxt" contenteditable="true">느낀 점</span></td>
+      <td>
+        <div class="sub" contenteditable="true" style="font-weight:400;color:#777;">(역할 수행 정도, 어려웠던 점, 극복 정도, 잘한 점, 아쉬웠던 점, 학급에 어떤 도움이 되었는지)</div>
+        <div class="write huge" contenteditable="true"></div>
+      </td>
+    </tr>
+  </table>
+  <div class="pageno">- 3 -</div>
+</div>
+
+<!-- PAGE 4 -->
+<div class="page" data-page="4">
+  <p class="sec-title lbltxt" contenteditable="true">4. 1학기 생활 자기평가</p>
+  <table class="t">
+    <colgroup><col style="width:44px"><col style="width:54px"><col></colgroup>
+    <tbody>
+    <tr>
+      <td class="lab pink" rowspan="5" style="writing-mode:vertical-rl;text-orientation:upright;letter-spacing:3px;"><span class="lbltxt" contenteditable="true">1학기 생활 자기평가</span></td>
+      <td class="lab pink"><span class="lbltxt" contenteditable="true">수업<br>태도</span></td>
+      <td>
+        <div class="sub" contenteditable="true" style="font-weight:400;color:#666;">적극적으로 참여했는지, 수업 태도가 좋았는지 등</div>
+        <div class="write tall" contenteditable="true"></div>
+      </td>
+    </tr>
+    <tr>
+      <td class="lab pink"><span class="lbltxt" contenteditable="true">학교<br>생활<br>태도</span></td>
+      <td>
+        <div class="sub" contenteditable="true" style="font-weight:400;color:#666;">지각했는지, 교복을 바르게 착용했는지, 교칙을 잘 지켰는지, 예의바른 태도였는지 등</div>
+        <div class="write tall" contenteditable="true"></div>
+      </td>
+    </tr>
+    <tr>
+      <td class="lab pink"><span class="lbltxt" contenteditable="true">1차<br>시험<br>성적</span></td>
+      <td>
+        <div class="scorehead"><span class="lbltxt" contenteditable="true">1차 시험 평균 :</span><span class="blank" contenteditable="true">&nbsp;</span>
+          <span style="margin-left:auto" class="lbltxt" contenteditable="true">만족도 :</span>
+          <span class="stars" onclick="starClick(event)"><span>☆</span><span>☆</span><span>☆</span><span>☆</span><span>☆</span></span>
+          <span class="note lbltxt" contenteditable="true">(만족한 만큼 별 색칠)</span></div>
+        <div class="sub" contenteditable="true" style="font-weight:400;color:#666;">자기주도적 학습을 했는지, 목표한 성적을 이루었는지, 나의 공부 방법은 어땠는지</div>
+        <div class="write tall" contenteditable="true"></div>
+        <div class="sub lbltxt" contenteditable="true">1차 고사 다짐 :</div>
+        <div class="write" contenteditable="true"></div>
+      </td>
+    </tr>
+    <tr>
+      <td class="lab pink"><span class="lbltxt" contenteditable="true">2차<br>시험<br>성적</span></td>
+      <td>
+        <div class="scorehead"><span class="lbltxt" contenteditable="true">2차 시험 평균 :</span><span class="blank" contenteditable="true">&nbsp;</span>
+          <span style="margin-left:auto" class="lbltxt" contenteditable="true">만족도 :</span>
+          <span class="stars" onclick="starClick(event)"><span>☆</span><span>☆</span><span>☆</span><span>☆</span><span>☆</span></span>
+          <span class="note lbltxt" contenteditable="true">(만족한 만큼 별 색칠)</span></div>
+        <div class="sub" contenteditable="true" style="font-weight:400;color:#666;">자기주도적 학습을 했는지, 목표한 성적을 이루었는지, 나의 공부 방법은 어땠는지</div>
+        <div class="write tall" contenteditable="true"></div>
+        <div class="sub lbltxt" contenteditable="true">2차 고사 다짐 :</div>
+        <div class="write" contenteditable="true"></div>
+      </td>
+    </tr>
+    <tr>
+      <td class="lab pink"><span class="lbltxt" contenteditable="true">학업<br>태도<br>평가</span></td>
+      <td>
+        <div class="sub" contenteditable="true" style="font-weight:400;color:#666;">시험, 수행평가, 자기주도 학습을 모두 평가해서 앞으로의 다짐을 적기</div>
+        <div class="write tall" contenteditable="true"></div>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+  <div class="pageno">- 4 -</div>
+</div>
+
+<!-- PAGE 5 -->
+<div class="page" data-page="5">
+  <p class="sec-title lbltxt" contenteditable="true">5. 독서 활동 상황 - 독서활동 상황 기록</p>
+  <table class="t" id="bookTable">
+    <colgroup><col style="width:36px"><col></colgroup>
+    <tbody></tbody>
+  </table>
+  <div class="pageno">- 5 -</div>
+</div>
+
+<script>
+  function bookRow(n){
+    return `<tr>
+      <td class="lab blue" style="vertical-align:middle"><span class="lbltxt" contenteditable="true">${n}</span></td>
+      <td style="padding:0">
+        <div style="background:var(--blue-hd);border-bottom:1px solid var(--line);padding:5px 9px;font-weight:700;font-size:12px;">
+          <span class="lbltxt" contenteditable="true">제목 :</span>
+          <span class="bk-title" contenteditable="true" style="font-weight:400;outline:none;">&nbsp;</span>
+        </div>
+        <div style="background:var(--blue-hd);border-bottom:1px solid var(--line);padding:5px 9px;font-size:11.5px;display:flex;flex-wrap:wrap;gap:4px 14px;">
+          <span><b class="lbltxt" contenteditable="true">저자 :</b> <span class="bk-author" contenteditable="true" style="outline:none">&nbsp;&nbsp;&nbsp;&nbsp;</span></span>
+          <span><b class="lbltxt" contenteditable="true">읽은 날짜 :</b> (시작)<span class="bk-start" contenteditable="true" style="outline:none">&nbsp;&nbsp;</span> ~ (종료)<span class="bk-end" contenteditable="true" style="outline:none">&nbsp;&nbsp;</span></span>
+          <span style="margin-left:auto"><b class="lbltxt" contenteditable="true">관련교과 :</b> <span class="bk-subject" contenteditable="true" style="outline:none">&nbsp;&nbsp;&nbsp;</span></span>
+        </div>
+        <div class="sub lbltxt" contenteditable="true">독서 감상문 :</div>
+        <div class="write tall bk-review" contenteditable="true"></div>
+      </td>
+    </tr>`;
+  }
+  document.querySelector('#bookTable tbody').innerHTML = [1,2,3,4,5].map(bookRow).join('');
+
+  function starClick(e){
+    if(e.target.tagName!=='SPAN') return;
+    const box=e.currentTarget, stars=[...box.children], i=stars.indexOf(e.target);
+    const filledNow = stars[i].textContent==='★' && (i===stars.length-1 || stars[i+1].textContent==='☆');
+    stars.forEach((s,j)=> s.textContent = (!filledNow && j<=i) ? '★' : '☆');
+  }
+
+  function busy(on){pngBtn.disabled=on;pdfBtn.disabled=on;}
+  function stamp(){return 'Self_Assessment_2026_1';}
+  async function pageCanvas(el){
+    return await html2canvas(el,{scale:3,backgroundColor:'#ffffff',useCORS:true,logging:false,
+      windowWidth:el.scrollWidth,windowHeight:el.scrollHeight});
+  }
+  async function savePNG(){
+    busy(true);
+    try{
+      await document.fonts.ready;
+      const pages=[...document.querySelectorAll('.page')];
+      const canvases=[];
+      for(const p of pages) canvases.push(await pageCanvas(p));
+      const gap=Math.round(24*3);
+      const W=Math.max(...canvases.map(c=>c.width));
+      const H=canvases.reduce((s,c)=>s+c.height,0)+gap*(canvases.length-1);
+      const out=document.createElement('canvas');out.width=W;out.height=H;
+      const ctx=out.getContext('2d');ctx.fillStyle='#e9ebf0';ctx.fillRect(0,0,W,H);
+      let y=0;for(const c of canvases){ctx.drawImage(c,(W-c.width)/2,y);y+=c.height+gap;}
+      const a=document.createElement('a');a.download=stamp()+'.png';a.href=out.toDataURL('image/png',1.0);a.click();
+    }catch(e){alert('PNG 저장 오류: '+e.message);}
+    busy(false);
+  }
+  async function savePDF(){
+    busy(true);
+    try{
+      await document.fonts.ready;
+      const {jsPDF}=window.jspdf;
+      const pdf=new jsPDF({orientation:'portrait',unit:'mm',format:'a4',compress:true});
+      const pages=[...document.querySelectorAll('.page')];
+      const pw=210;
+      for(let i=0;i<pages.length;i++){
+        const c=await pageCanvas(pages[i]);
+        const img=c.toDataURL('image/jpeg',0.95);
+        if(i>0) pdf.addPage();
+        pdf.addImage(img,'JPEG',0,0,pw,c.height*pw/c.width);
+      }
+      pdf.save(stamp()+'.pdf');
+    }catch(e){alert('PDF 저장 오류: '+e.message);}
+    busy(false);
+  }
+
+  /* ===== HERO animations ===== */
+  (function(){
+    const canvas=document.getElementById('heroParticles');
+    if(!canvas) return;
+    const ctx=canvas.getContext('2d');
+    let W,H,pts=[];
+    function resize(){W=canvas.width=canvas.offsetWidth;H=canvas.height=canvas.offsetHeight;}
+    resize();window.addEventListener('resize',resize);
+    for(let i=0;i<50;i++)pts.push({x:Math.random()*900,y:Math.random()*330,r:Math.random()*1.4+.3,
+      vx:(Math.random()-.5)*.25,vy:(Math.random()-.5)*.25,a:Math.random()*.45+.08,
+      c:Math.random()>.5?'59,130,246':'6,182,212'});
+    function draw(){
+      ctx.clearRect(0,0,W,H);
+      pts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;
+        if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+        ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle='rgba('+p.c+','+p.a+')';ctx.fill();});
+      pts.forEach((a,i)=>pts.slice(i+1).forEach(b=>{
+        const dx=a.x-b.x,dy=a.y-b.y,d=Math.sqrt(dx*dx+dy*dy);
+        if(d<110){ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);
+          ctx.strokeStyle='rgba(59,130,246,'+(0.07*(1-d/110))+')';ctx.lineWidth=.5;ctx.stroke();}}));
+      requestAnimationFrame(draw);
+    }
+    draw();
+  })();
+  (function(){
+    const items=['나를 설명하는 힘','활동의 나열이 아닌 사고의 구조','수업연계 → 역할 → 자료 → 결과물 → 성장 → 역량',
+      '과정의 흔적을 남기는 글쓰기','세특·면접의 핵심 자료','생활기록부 기록 참고용','메타인지로 완성하는 자기평가'];
+    const d=[...items,...items];
+    const t=document.getElementById('heroTicker');
+    if(t)t.innerHTML=d.map(x=>'<span class="ticker-item">◈ '+x+'</span>').join('');
+  })();
+  function heroCount(id,target,delay){
+    const el=document.getElementById(id);if(!el)return;
+    setTimeout(()=>{const start=performance.now();
+      (function up(now){const t=Math.min((now-start)/1200,1),e=1-Math.pow(1-t,3);
+        el.textContent=Math.round(e*target);if(t<1)requestAnimationFrame(up);})(performance.now());
+    },delay);
+  }
+  heroCount('hs1',5,200);heroCount('hs2',6,350);heroCount('hs3',5,500);heroCount('hs4',5,650);
+
+  /* ===== DEMO (예시 채우기 / 비우기) ===== */
+  const DEMO_WRITES=[
+    "흡연이 호흡기·심혈관에 미치는 영향과 니코틴 중독 기전, 간접흡연의 위험성을 사례 영상과 함께 배웠다. 특히 청소년기 흡연이 뇌 발달에 큰 영향을 준다는 점이 인상적이었다.",
+    "막연히 '몸에 나쁘다'고만 알았는데, 니코틴이 도파민 보상 회로를 자극해 끊기 어려워진다는 원리를 생물 시간에 배운 신경전달물질 개념과 연결해 이해할 수 있었다. 또래의 권유를 거절하는 구체적 방법도 정리해 두었다.",
+    "교실 사용 규칙 개선과 사물함 정리 캠페인 운영 방안",
+    "청소 구역을 주차별로 순환하고 점검표를 부착해 책임 소재를 분명히 하자고 제안했고, 분실물 보관함 신설을 함께 건의했다.",
+    "처음엔 '번거롭다'는 반대가 많았지만, 친구들의 우려를 듣고 점검표를 간소화한 절충안을 다시 제시해 합의를 이끌어냈다. 의견을 관철하기보다 조율하는 과정이 더 중요하다는 것을 느꼈다.",
+    "이어달리기(400m 계주) 3주자, 학급 대항 피구",
+    "계주에서 바통 인수 구간을 맡아 앞 주자와 출발 타이밍을 맞추는 연습을 주도했다. 1차 연습 기록이 좋지 않아 출발 신호 거리를 조정해 약 0.5초를 단축했다. 결과보다 팀이 함께 전략을 수정해 나가는 과정에서 협업의 의미를 배웠다.",
+    "저작권과 초상권, 사이버 폭력의 법적 책임, 개인정보 보호와 안전한 비밀번호 관리법을 배웠다.",
+    "무심코 공유하던 이미지가 저작권 침해가 될 수 있음을 알고, 이후 발표 자료를 만들 때 출처 표기와 이용허락(CCL) 자료를 찾아 쓰는 습관을 들이게 되었다.",
+    "학습부장에 출마해 '질문이 편한 학급'을 공약으로 내세웠다. 모르는 문제를 모아 게시하는 질문판과 또래 멘토링을 제안했고, 떨렸지만 준비한 근거를 차분히 설명했다. 아쉽게 선출되지는 못했지만, 당선된 친구를 도와 멘토링 짝꿍 제도를 함께 만들었다.",
+    "데이터 분석가 / 컴퓨터공학 연구원",
+    "사회문화 시간에 같은 수치라도 표현 방식에 따라 다르게 읽힌다는 점에 흥미를 느껴 데이터를 바르게 해석하는 일에 관심을 갖게 되었다. 이후 파이썬 기초 강의를 듣고 학급 설문 결과를 직접 그래프로 시각화해 보았으며, 『세상에서 가장 쉬운 통계학 입문』으로 평균·분산 개념을 보완했다. 앞으로 데이터 윤리와 개인정보 문제로 탐구를 확장하려 한다.",
+    "1인 1역으로 '학습 도우미(질문판 관리)'를 맡아, 매주 친구들이 어려워한 문제를 모아 게시하고 해설 자료를 정리했다.",
+    "처음엔 질문을 모으는 일이 번거로웠지만, 비슷한 질문이 반복된다는 점을 발견해 '자주 묻는 문제 모음(FAQ)'을 따로 만들었다. 해설을 정리하려면 내가 먼저 정확히 이해해야 해서 오히려 내 공부에 큰 도움이 되었고, 학급의 질문 분위기가 활발해지는 데 기여했다고 생각한다.",
+    "발표와 모둠 활동에 적극적으로 참여했고, 모르는 부분은 넘기지 않고 수업 후 질문하는 습관을 들였다. 다만 집중이 흐트러질 때가 있어 코넬 노트 필기법으로 보완했다.",
+    "지각 없이 등교하고 교복을 단정히 착용했다. 복도에서 뛰지 않기·인사하기 등 기본 규칙을 지키려 노력했고, 친구의 사소한 부탁도 성의 있게 도왔다.",
+    "계획표는 세웠지만 시험 직전 몰아서 공부하는 습관 탓에 수학에서 실수가 많아, 목표 평균에 약간 못 미쳤다.",
+    "오답 노트를 만들어 틀린 유형을 주 단위로 복습하고, 벼락치기 대신 매일 일정 분량을 학습하겠다.",
+    "1차의 반성을 반영해 오답 노트를 꾸준히 활용한 결과 수학 점수가 올랐다. 다만 암기 과목의 누적 복습이 부족했다.",
+    "암기 과목은 '배운 날 당일 복습 + 주말 누적 복습' 루틴을 정착시키겠다.",
+    "한 학기 동안 '계획만 세우는 학습'에서 '매일 실천하고 점검하는 학습'으로 바뀐 것이 가장 큰 성장이다. 결과에 일희일비하기보다 방법을 수정해 나가는 태도가 중요함을 배웠고, 2학기에는 과목별 학습량을 균형 있게 배분하겠다."
+  ];
+  const DEMO_BOOKS=[
+    {t:"팩트풀니스",a:"한스 로슬링",s:"4/5",e:"4/19",c:"사회문화",r:"세상을 부정적으로만 보는 본능을 데이터로 점검하는 과정이 인상 깊었다. 막연한 인상 대신 수치로 확인하는 습관의 중요성을 배웠고, 진로인 데이터 분석과 연결해 '데이터를 어떻게 읽느냐'가 결론을 바꾼다는 점을 깨달았다."},
+    {t:"세상에서 가장 쉬운 통계학 입문",a:"고지마 히로유키",s:"4/22",e:"5/3",c:"수학",r:"평균·분산·표준편차의 의미를 그림으로 이해하게 되었다. 학급 설문 결과에 직접 적용해 분포를 해석해 보며, 수업에서 배운 통계 단원이 실제로 어떻게 쓰이는지 체감했다."},
+    {t:"소비의 사회",a:"장 보드리야르",s:"5/6",e:"5/24",c:"사회문화",r:"쇼핑 공간이 단순 판매 장소가 아니라 소비 욕망을 설계하는 구조라는 관점이 신선했다. 다소 어려웠지만 평소 당연하게 여기던 광고와 매장 동선을 비판적으로 바라보게 되었다."},
+    {t:"코스모스",a:"칼 세이건",s:"5/27",e:"6/14",c:"통합과학",r:"증거에 기반한 과학적 회의주의의 태도가 인상적이었다. 모르는 것을 인정하고 질문을 이어가는 자세가 탐구의 출발점임을 배웠다."},
+    {t:"넛지",a:"리처드 탈러·캐스 선스타인",s:"6/17",e:"6/30",c:"사회문화",r:"선택 설계가 행동을 바꾼다는 개념을, 학급회의에서 제안했던 '점검표' 아이디어와 연결해 이해했다. 작은 장치가 행동을 유도한다는 점에서 후속 탐구 주제로 이어가고 싶다."}
+  ];
+  let demoOn=false;
+  function bodyWrites(){return [...document.querySelectorAll('.write')].filter(w=>!w.closest('#bookTable'));}
+  function setStars(box,n){[...box.children].forEach((s,i)=>s.textContent=i<n?'★':'☆');}
+  function fillDemo(){
+    const w=bodyWrites();
+    DEMO_WRITES.forEach((t,i)=>{if(w[i])w[i].textContent=t;});
+    const blanks=document.querySelectorAll('.blank');
+    if(blanks[0])blanks[0].textContent='82점'; if(blanks[1])blanks[1].textContent='87점';
+    const stars=document.querySelectorAll('.stars');
+    if(stars[0])setStars(stars[0],3); if(stars[1])setStars(stars[1],4);
+    document.querySelectorAll('#bookTable tbody tr').forEach((row,i)=>{const b=DEMO_BOOKS[i]; if(!b)return;
+      const set=(sel,v)=>{const el=row.querySelector(sel); if(el)el.textContent=v;};
+      set('.bk-title',b.t);set('.bk-author',b.a);set('.bk-start',b.s);set('.bk-end',b.e);set('.bk-subject',b.c);set('.bk-review',b.r);});
+    const p=document.querySelector('.period'); if(p)p.textContent='2026학년도 1학기';
+  }
+  function clearDemo(){
+    bodyWrites().forEach(w=>w.textContent='');
+    document.querySelectorAll('.blank').forEach(b=>b.innerHTML='&nbsp;');
+    document.querySelectorAll('.stars').forEach(s=>setStars(s,0));
+    document.querySelectorAll('#bookTable tbody tr').forEach(row=>{
+      ['.bk-title','.bk-author','.bk-start','.bk-end','.bk-subject','.bk-review'].forEach(sel=>{const el=row.querySelector(sel); if(el)el.textContent='';});});
+  }
+  function toggleDemo(btn){
+    if(!demoOn){
+      fillDemo(); demoOn=true; btn.classList.add('on');
+      btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg> 데모 비우기';
+      const first=document.querySelector('.page'); if(first)first.scrollIntoView({behavior:'smooth',block:'start'});
+    }else{
+      if(!confirm('예시 내용을 모두 지우고 빈 양식으로 되돌릴까요?')) return;
+      clearDemo(); demoOn=false; btn.classList.remove('on');
+      btn.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3l14 9-14 9V3z"/></svg> 데모 채우기';
+    }
+  }
+
+  /* ===== WORD (.doc) 저장 — 편집 가능한 워드 문서 ===== */
+  const esc = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const itext = el => (el && (el.innerText!=null?el.innerText:el.textContent)) || '';
+  function labelText(el){ return el ? el.innerHTML.replace(/<br\s*\/?>/gi,' ').replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim() : ''; }
+  function multiline(el){ return esc(itext(el)).replace(/\r?\n/g,'<br>'); }
+  const LAB_FILL = { green:'#dfead0', pink:'#f6d4d8', blue:'#cfe6f4' };
+
+  function contentCellHtml(td){
+    let out='';
+    td.childNodes.forEach(n=>{
+      if(n.nodeType!==1) return;
+      const cl=n.classList||{contains:()=>false};
+      if(cl.contains('sub')){
+        const bold = !(n.getAttribute && /font-weight:\s*400/.test(n.getAttribute('style')||''));
+        out += '<p style="margin:1px 0;'+(bold?'font-weight:bold;':'color:#666;')+'">'+esc(labelText(n))+'</p>';
+      } else if(cl.contains('scorehead')){
+        out += '<p style="margin:2px 0;font-weight:bold;">'+esc(itext(n).replace(/\s+/g,' ').trim())+'</p>';
+      } else if(cl.contains('write')){
+        const v=multiline(n);
+        out += '<p style="margin:1px 0 7px;border-bottom:1px dotted #bbb;min-height:14pt;">'+(v||'&nbsp;')+'</p>';
+      } else if(n.tagName==='DIV'){
+        out += '<p style="margin:1px 0;">'+esc(itext(n).replace(/\s+/g,' ').trim())+'</p>';
+      }
+    });
+    return out || '&nbsp;';
+  }
+
+  function tableToWord(tbl){
+    let html='<table style="border-collapse:collapse;width:100%;margin:6px 0 14px;border:1.2pt solid #555;">';
+    tbl.querySelectorAll('tr').forEach(tr=>{
+      html+='<tr>';
+      [...tr.children].forEach(td=>{
+        const cl=td.classList;
+        const isLab = cl.contains('lab')||cl.contains('hdr-main');
+        let fill='';
+        if(cl.contains('green'))fill=LAB_FILL.green; else if(cl.contains('pink'))fill=LAB_FILL.pink;
+        else if(cl.contains('blue'))fill=LAB_FILL.blue; else if(cl.contains('hdr-green'))fill='#eef3e6';
+        else if(cl.contains('hdr-main'))fill='#f2f2f2';
+        const span=(td.getAttribute('colspan')?(' colspan="'+td.getAttribute('colspan')+'"'):'')+(td.getAttribute('rowspan')?(' rowspan="'+td.getAttribute('rowspan')+'"'):'');
+        const base='border:0.75pt solid #9aa0aa;padding:4px 7px;vertical-align:top;'+(fill?('background:'+fill+';'):'');
+        if(isLab){
+          html+='<td'+span+' style="'+base+'text-align:center;font-weight:bold;font-size:9.5pt;">'+esc(labelText(td.querySelector('span')||td))+'</td>';
+        }else{
+          html+='<td'+span+' style="'+base+'">'+contentCellHtml(td)+'</td>';
+        }
+      });
+      html+='</tr>';
+    });
+    return html+'</table>';
+  }
+
+  function pageToWord(page){
+    let html='';
+    page.childNodes.forEach(n=>{
+      if(n.nodeType!==1) return;
+      const cl=n.classList||{contains:()=>false};
+      if(cl.contains('pageno')||cl.contains('no-print')) return;
+      if(cl.contains('period')) html+='<p style="text-align:center;font-weight:bold;font-size:13pt;color:#0D2B6E;margin:2px 0 6px;">'+esc(labelText(n))+'</p>';
+      else if(cl.contains('topnote')) html+='<p style="text-align:center;font-size:8.5pt;color:#444;margin:0 0 10px;">'+esc(labelText(n))+'</p>';
+      else if(cl.contains('sec-title')) html+='<p style="font-weight:bold;font-size:12pt;color:#0D2B6E;margin:14px 0 4px;">'+esc(labelText(n))+'</p>';
+      else if(cl.contains('goldbar')) html+='<p style="background:#f6edcf;border:0.75pt solid #d9c98f;text-align:center;font-weight:bold;font-size:10pt;padding:5px;margin:6px 0 0;">'+esc(labelText(n))+'</p>';
+      else if(cl.contains('write')) html+='<p style="border:0.75pt solid #9aa0aa;border-top:none;padding:6px 8px;min-height:30pt;margin:0 0 6px;">'+(multiline(n)||'&nbsp;')+'</p>';
+      else if(n.tagName==='TABLE') html+=tableToWord(n);
+    });
+    return html;
+  }
+
+  function saveWord(){
+    const pages=[...document.querySelectorAll('.page')];
+    let body='<h1 style="text-align:center;color:#0D2B6E;font-size:20pt;margin:0 0 2px;">자기평가서</h1>'
+           + '<p style="text-align:center;color:#888;font-size:8.5pt;margin:0 0 14px;">생활기록부 기록 참고용 · 학생 작성</p>';
+    pages.forEach((p,i)=>{
+      if(i>0) body+='<br clear="all" style="mso-special-character:line-break;page-break-before:always;">';
+      body+=pageToWord(p);
+    });
+    const html='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">'
+      +'<head><meta charset="utf-8"><title>자기평가서</title>'
+      +'<!--[if gte mso 9]><xml><w:WordDocument><w:View>Print</w:View><w:Zoom>100</w:Zoom></w:WordDocument></xml><![endif]-->'
+      +'<style>@page{size:21cm 29.7cm;margin:1.8cm 1.8cm;} '
+      +'body{font-family:"맑은 고딕","Malgun Gothic",sans-serif;font-size:10.5pt;color:#222;line-height:1.5;} '
+      +'table{border-collapse:collapse;} p{margin:0 0 4px;}</style></head><body>'+body+'</body></html>';
+    const blob=new Blob(['\ufeff'+html],{type:'application/msword'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=stamp()+'.doc';
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},1500);
+  }
+</script>
+</body>
+</html>
